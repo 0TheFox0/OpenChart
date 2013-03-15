@@ -1,0 +1,13 @@
+CONFIG      += designer plugin debug_and_release
+TARGET      = $$qtLibraryTarget(openchartplugin)
+TEMPLATE    = lib
+
+HEADERS     = openchartplugin.h
+SOURCES     = openchartplugin.cpp
+RESOURCES   = icons.qrc
+LIBS        += -L. 
+
+target.path = $$[QT_INSTALL_PLUGINS]/designer
+INSTALLS    += target
+
+include(openchart.pri)
