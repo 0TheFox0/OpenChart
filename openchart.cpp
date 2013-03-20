@@ -189,6 +189,9 @@ void OpenChart::paintEvent(QPaintEvent *)
     if(m_menor <0)
         range -= m_menor;
 
+    if(range == 0)
+        return;
+
     if(m_mayor == m_maxValue)
     {
         double pPerc = (m_mayor*100)/range;
@@ -238,6 +241,9 @@ void OpenChart::drawBar(QPainter *painter)
     int range = m_mayor;
     if(m_menor <0)
         range -= m_menor;
+
+    if(range == 0)
+        return;
 
     for (int i=0;i<pieces.size();i++)
     {
@@ -336,6 +342,9 @@ void OpenChart::drawMultiBar(QPainter *painter)
     int range = m_mayor;
     if(m_menor <0)
         range -= m_menor;
+
+    if(range == 0)
+        return;
 
     for (int i=0;i<pieces.size();i++)
     {
@@ -444,6 +453,9 @@ void OpenChart::drawLines(QPainter *painter)
     int range = m_mayor;
     if(m_menor<0)
         range -= m_menor;
+
+    if(range == 0)
+        return;
 
     double pDist;
     int start = m_left+15;
