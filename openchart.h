@@ -90,6 +90,8 @@ public:
     void addItem(QString nombre, QVector<float> values);
     void addItem(QString nombre, QVector<float> values, QColor color);
     void addMulibarColor(QString nombre , QColor color);
+
+    void Clear(){pieces.clear();multibarColors.clear();lineasStops.clear();}
 protected:
     void paintEvent(QPaintEvent *);
     void drawBar(QPainter* painter);

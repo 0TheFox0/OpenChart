@@ -14,10 +14,9 @@ OpenChart::OpenChart(QWidget *parent) :
     m_sombra = true;
     m_useLeyenda = true;
     m_tipoLeyenda = Vertical;
-
+    m_usingTitle = true;
     m_title = "Un titulo";
-
-    QVector<float>v1;
+/*    QVector<float>v1;
     v1 << 10 << 20 << 5;
     QVector<float>v2;
     v2 << -10 << -20 << -5;
@@ -28,7 +27,7 @@ OpenChart::OpenChart(QWidget *parent) :
     addMulibarColor("Compras",Qt::darkRed);
     addMulibarColor("Ventas",Qt::darkGreen);
 
-    lineasStops << "Hola" <<"Hola-Adios"<< "Adios";
+    lineasStops << "Hola" <<"Hola-Adios"<< "Adios";*/
 }
 
 QSize OpenChart::minimumSizeHint() const
@@ -96,6 +95,14 @@ void OpenChart::paintEvent(QPaintEvent *)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setFont(m_letra);    
 
+    if(pieces.isEmpty())
+    {
+        m_xAxis = height()/2;
+        m_left = 5;
+        m_rigth = width();
+        drawAxis(&painter);
+        return;
+    }
 //    painter.drawRect(0,0,width()-1,height()-1);
 
     int fontH = painter.fontMetrics().height();
