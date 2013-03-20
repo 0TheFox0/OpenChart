@@ -10,7 +10,7 @@ OpenChart::OpenChart(QWidget *parent) :
     m_maxValue = 0;
     m_menor = 0;
 
-    m_type = BarraMultiple;
+    m_type = Lineas;
     m_sombra = true;
     m_useLeyenda = true;
     m_tipoLeyenda = Vertical;
@@ -18,15 +18,17 @@ OpenChart::OpenChart(QWidget *parent) :
     m_title = "Un titulo";
 
     QVector<float>v1;
-    v1 << 10 << 20;
+    v1 << 10 << 20 << 5;
     QVector<float>v2;
-    v2 << -10 << -20;
-    addItem("holaaaaaaaaaaaaaaaaaaaaaaaaaa",v1);
-    addItem("hola-adios",v1);
+    v2 << -10 << -20 << -5;
+    //addItem("holaaaaaaa",v1);
+    //addItem("hola-adios",v1);
     addItem("adios",v2);
 
     addMulibarColor("Compras",Qt::darkRed);
     addMulibarColor("Ventas",Qt::darkGreen);
+
+    lineasStops << "Hola" <<"Hola-Adios"<< "Adios";
 }
 
 QSize OpenChart::minimumSizeHint() const
@@ -91,9 +93,10 @@ void OpenChart::addMulibarColor(QString nombre, QColor color)
 void OpenChart::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setFont(m_letra);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setFont(m_letra);    
 
-   // painter.drawRect(0,0,width()-1,height()-1);
+//    painter.drawRect(0,0,width()-1,height()-1);
 
     int fontH = painter.fontMetrics().height();
 
@@ -112,7 +115,12 @@ void OpenChart::paintEvent(QPaintEvent *)
         if(m_tipoLeyenda == Vertical && m_type != BarraMultiple)
         {
             for(int i=0;i< pieces.size(); i++)
-                maxLength = qMax(maxLength,painter.fontMetrics().width(QString("%1 : %2").arg(pieces.at(i).nombre).arg(pieces.at(i).value())));
+            {
+                if(m_type != Lineas)
+                    maxLength = qMax(maxLength,painter.fontMetrics().width(QString("%1 : %2").arg(pieces.at(i).nombre).arg(pieces.at(i).value())));
+                else
+                     maxLength = qMax(maxLength,painter.fontMetrics().width(pieces.at(i).nombre));
+            }
         }
         else if(m_tipoLeyenda == Vertical && m_type == BarraMultiple)
         {
@@ -128,7 +136,7 @@ void OpenChart::paintEvent(QPaintEvent *)
     m_bottom = this->height();
     if(m_labels)
     {
-        if(m_type == BarraMultiple)
+        if(m_type == BarraMultiple || m_type == Lineas)
         {
             if(m_mayor >= 0 && m_menor >=0)
                 m_bottom -= fontH;
@@ -140,7 +148,7 @@ void OpenChart::paintEvent(QPaintEvent *)
                 m_bottom -= fontH;
             }
         }
-        else if(m_type == Barras)
+        else if(m_type == Barras )
         {
             if(m_mayor<=0)
                 m_top+=fontH;
@@ -151,9 +159,9 @@ void OpenChart::paintEvent(QPaintEvent *)
     if(m_values)
     {
         if(m_mayor >0)
-            m_top+=fontH;
+            m_top+=fontH+2;
         if(m_menor<0)
-            m_bottom -=fontH;
+            m_bottom -=fontH+2;
     }
     if(m_usingTitle)
     {
@@ -200,6 +208,10 @@ void OpenChart::paintEvent(QPaintEvent *)
     case BarraMultiple:
         drawMultiBar(&painter);
         drawAxis(&painter);
+        break;
+    case Lineas:
+        drawAxis(&painter);
+        drawLines(&painter);
     default:
         break;
     }
@@ -422,6 +434,152 @@ void OpenChart::drawMultiBar(QPainter *painter)
 
 void OpenChart::drawLines(QPainter *painter)
 {
+    int range = m_mayor;
+    if(m_menor<0)
+        range -= m_menor;
+
+    double pDist;
+    int start = m_left+15;
+    pDist = (m_width-start)/(lineasStops.size()-1);
+    QVector<float> xPositions;
+    for(int i=0;i<lineasStops.size();i++)
+        xPositions.append(start+pDist*i);
+
+    if(m_labels && !lineasStops.isEmpty())
+    {
+        xPositions.clear();
+        start = m_left+15+painter->fontMetrics().width(lineasStops.at(0));
+            pDist = (m_width-start-painter->fontMetrics().width(lineasStops.last()))/(lineasStops.size()-1);
+            for(int i=0;i<lineasStops.size();i++)
+                xPositions.append(start+pDist*i);
+    }
+
+    if(m_sombra)
+    {
+        painter->setPen(Qt::NoPen);
+        for(int i=0;i<pieces.size();i++)
+        {
+            QColor c = pieces.at(i).color;
+            c.setAlpha(5);
+
+            QColor c1 = pieces.at(i).color;
+            c1.setAlpha(50);
+
+
+            int use = qMin(pieces.at(i).getValues().size(), lineasStops.size());
+            int pointCount = use + 2;
+
+            QVector<QPoint> points;
+            points.reserve(pointCount);
+            points.resize(pointCount);
+
+            for (int a=0;a<pointCount-2;a++)
+            {
+                float _p = (pieces.at(i).getValues().at(a)*100)/range;
+                if(_p < 0)
+                    _p = -_p;
+
+                double x = _p/100.0;
+                double y = m_heigth*x;
+
+                if(pieces.at(i).getValues().at(a)>=0)
+                    points[a] = QPoint(xPositions.at(a),m_xAxis - y);
+                else
+                    points[a] = QPoint(xPositions.at(a),m_xAxis + y);
+            }
+
+            points[pointCount-2] = QPoint(xPositions.at(use-1),m_xAxis);
+            points[pointCount-1] = QPoint(xPositions.at(0),m_xAxis);
+
+            int _max=0;
+            int _min=0;
+            for (int a=0;a<pointCount-2;a++)
+            {
+                _max = qMax(_max,points[a].y());
+                _min = qMin(_min,points[a].y());
+            }
+            QLinearGradient gradient(m_left,_max,m_left,_min);
+            gradient.setColorAt(0,c);
+            gradient.setColorAt(0.5,c1);
+            gradient.setColorAt(1,c);
+            painter->setBrush(gradient);
+
+            painter->drawPolygon(points.data(),pointCount);
+        }
+    }
+    if (m_labels)
+    {
+        painter->setPen(Qt::SolidLine);
+        for(int i=0;i<lineasStops.size();i++)
+        {
+            if(m_mayor<=0)
+                painter->drawText(xPositions.at(i)-painter->fontMetrics().width(lineasStops.at(i))/2,m_top-painter->fontMetrics().height()/2+3,lineasStops.at(i));
+            else
+                painter->drawText(xPositions.at(i)-painter->fontMetrics().width(lineasStops.at(i))/2,height()-painter->fontMetrics().height()/2+3,lineasStops.at(i));
+        }
+    }
+
+    for(int i=0;i<pieces.size();i++)
+    {
+        int use = qMin(pieces.at(i).getValues().size(), lineasStops.size());
+        int pointCount = use;
+
+        //QPoint points[pointCount];
+        QVector<QPoint> points;
+        points.reserve(pointCount);
+        points.resize(pointCount);
+
+        QPen pen;
+        pen.setColor(pieces.at(i).color);
+        pen.setWidth(2);
+        for (int a=0;a<pointCount;a++)
+        {
+            float _p = (pieces.at(i).getValues().at(a)*100)/range;
+            if(_p < 0)
+                _p = -_p;
+
+            double x = _p/100.0;
+            double y = m_heigth*x;
+
+            if(pieces.at(i).getValues().at(a)>=0)
+                points[a] = QPoint(xPositions.at(a),m_xAxis - y);
+            else
+                points[a] = QPoint(xPositions.at(a),m_xAxis + y);
+
+        }
+        painter->setPen(pen);
+        painter->drawPolyline(points.data(),pointCount);
+        QColor c = pieces.at(i).color;
+        c.setAlpha(50);
+        painter->setBrush(c);
+        for (int a=0;a<pointCount;a++)
+            painter->drawEllipse(points[a],3,3);
+
+        if(m_values)
+        {
+            painter->setPen(Qt::SolidLine);
+            for (int a=0;a<pointCount;a++)
+            {
+                QString s = QString::number(pieces.at(i).getValues().at(a));
+                bool above = true;
+                if(a!= pointCount-1)
+                {
+                    if(points[a].y()> points[a+1].y())
+                        above = false;
+                }
+                if(/*points[a].y() <= m_top + m_xAxisPos*/above)
+                {
+                    painter->drawText(points[a].x()-painter->fontMetrics().width(s),points[a].y()-painter->fontMetrics().height()/2,s);
+                }
+                else
+                {
+                    painter->drawText(points[a].x()-painter->fontMetrics().width(s),points[a].y()+painter->fontMetrics().height(),s);
+                }
+            }
+        }
+    }
+    if(m_useLeyenda)
+        drawLeyendaVertical(painter);
 }
 
 void OpenChart::drawAxis(QPainter *painter)
@@ -468,7 +626,9 @@ void OpenChart::drawLeyendaVertical(QPainter *painter)
             float x = m_rigth+dist;
             float y = m_top+dist+i*(painter->fontMetrics().height()+2*dist);
             painter->drawRect(x,y,painter->fontMetrics().height(),painter->fontMetrics().height());
-            QString s = pieces.at(i).nombre + " : " + QString::number(pieces.at(i).value());
+            QString s = pieces.at(i).nombre;
+            if(m_type != Lineas)
+                s.append(" : " + QString::number(pieces.at(i).value()));
             painter->drawText(x+painter->fontMetrics().height()+dist,y+painter->fontMetrics().height()/2+dist,s);
         }
     }
