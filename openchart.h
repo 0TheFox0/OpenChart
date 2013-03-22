@@ -97,6 +97,7 @@ protected:
     void drawBar(QPainter* painter);
     void drawMultiBar(QPainter* painter);
     void drawLines(QPainter* painter);
+    void drawPie(QPainter* painter);
 private:
     int m_left , m_top , m_bottom , m_rigth , m_width , m_heigth, m_xAxis;
     int m_maxValue, m_mayor , m_menor;
@@ -121,6 +122,9 @@ private:
 
     void drawAxis(QPainter* painter);
     void drawLeyendaVertical(QPainter* painter);
+    void drawLeyendaCircular(QPainter* painter);
+    void drawYValues(QPainter* painter);
+    QPointF GetPoint(double angle, double R1 = 0, double R2 = 0);
 };
 
 #endif
