@@ -19,24 +19,30 @@ OpenChart::OpenChart(QWidget *parent) :
     m_usingTitle = true;
     m_title = "Un titulo";
     m_valuesEnY = true;
-/*
+
     QVector<float>v1;
-    v1 << 90 << 20 << 5;
+    v1 << 10 << 20 << 5;
 
     QVector<float>v2;
-    v2 << 270 << -20 << -5;
-    addItem("holaaaaaaa",v1,Qt::darkBlue);
-    addItem("hola-adios",v1);
-    addItem("hola-adios",v1);
-    addItem("hola-adios",v1);
-    addItem("hola-adios",v1);
-    addItem("hola-adios",v1);
-     addItem("hola-adios",v1);
-      addItem("hola-adios",v1);
-       addItem("hola-adios",v1);
-    addItem("adios",v1,Qt::darkGreen);
+    v2 << 20 << -20 << -5;
+    addItem("1",v1,Qt::darkBlue);
+    addItem("2",v1);
+    addItem("3",v1);
+    addItem("4",v1);
+    addItem("5",v1);
+    addItem("6",v1);
+     addItem("7",v1);
+      addItem("8",v1);
+       addItem("9",v1);
+    addItem("10",v1,Qt::darkGreen);
+    addItem("11",v1);
+    addItem("12",v1);
+    addItem("13",v1);
+    addItem("14",v1);
+    addItem("15",v1);
+    addItem("16",v1);
 
-    lineasStops << "Hola" <<"Hola-Adios"<< "Adios";*/
+    lineasStops << "Hola" <<"Hola-Adios"<< "Adios";
 }
 
 QSize OpenChart::minimumSizeHint() const
@@ -791,6 +797,11 @@ void OpenChart::drawLeyendaCircular(QPainter *painter)
     for(int i=0;i<pieces.size();i++)
         total+=pieces.at(i).value();
 
+
+    QVector<roundLabelPoints> top_labels;
+    QVector<roundLabelPoints> rigth_labels;
+    QVector<roundLabelPoints> bottom_labels;
+    QVector<roundLabelPoints> left_labels;
     for (int i=0;i<pieces.size();i++)
     {
         QString s = QString("%1 : %2").arg(pieces.at(i).nombre).arg(pieces.at(i).value());
@@ -808,57 +819,92 @@ void OpenChart::drawLeyendaCircular(QPainter *painter)
         QLineF left_line (QPoint(m_left-10,0),QPoint(m_left-10,height()));
         QLineF bottom_line (QPoint(0,m_bottom+10),QPoint(m_width,m_bottom+10));
         QLineF rigth_line (QPoint(m_rigth+10,0),QPoint(m_rigth+10,height()));
+
         if(pUse >=45 && pUse <=135)
         {
             if(line.intersect(top_line,&intersec) == QLineF::UnboundedIntersection
                     || line.intersect(top_line,&intersec) == QLineF::BoundedIntersection)
             {
-                bool rigth = intersec.x() >= width()/2;
-                bool midle = (width()/2 - 5 <= intersec.x()) && (intersec.x() <= width()/2 + 5);
-                if(midle)
+               /* bool rigth = intersec.x() >= width()/2;
+                if(rigth)
                 {
-                    painter->drawLine(start,QPoint(width()/2,intersec.y()+fontH/2));
-                    painter->drawRoundRect(width()/2 - fontW/2,intersec.y()-fontH/2-5,fontW+14,fontH+2);
-                    painter->drawText(width()/2 - fontW/2+5,intersec.y()+fontH/2-5,s);
-                }
-                else
-                {
-                    if(rigth)
+                    if(intersec.x()+fontW+14 > width())
                     {
-                        if(intersec.x()+fontW+14 > width())
-                            line.intersect(rigth_line,&intersec);
-
-                        painter->drawLine(start,intersec);
-                        painter->drawLine(intersec,QPoint(intersec.x()+6,intersec.y()));
-                        painter->drawRoundRect(intersec.x()+6,intersec.y()-fontH/2,fontW+14,fontH+2);
-                        painter->drawText(intersec.x()+13,intersec.y()+fontH/2,s);
+                        line.intersect(rigth_line,&intersec);
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        rigth_labels.append(r);
                     }
                     else
                     {
-                        if(intersec.x()-fontW-14 < 0)
-                            line.intersect(left_line,&intersec);
-                        painter->drawLine(start,intersec);
-                        painter->drawLine(intersec,QPoint(intersec.x()-6,intersec.y()));
-                        painter->drawRoundRect(intersec.x()-fontW-14,intersec.y()-fontH/2,fontW+7,fontH+2);
-                        painter->drawText(intersec.x()-fontW-10,intersec.y()+fontH/2,s);
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        top_labels.append(r);
                     }
                 }
+                else
+                {
+                    if(intersec.x()-fontW-14 < 0)
+                    {
+                        line.intersect(left_line,&intersec);
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        left_labels.append(r);
+                    }
+                    else
+                    {
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        top_labels.append(r);
+                    }
+                }*/
+                roundLabelPoints r;
+                r.name = pieces.at(i).nombre;
+                r.start = start;
+                r.value = pieces.at(i).value();
+                top_labels.append(r);
             }
         }
         else if(pUse >135 && pUse <=225)
         {
-
             if(line.intersect(left_line,&intersec) == QLineF::UnboundedIntersection
                     || line.intersect(left_line,&intersec) == QLineF::BoundedIntersection)
             {
-                if(intersec.y()-fontH/2 < 0)
+              /*  if(intersec.y()-fontH/2 < 0)
+                {
                     line.intersect(top_line,&intersec);
-                if(intersec.y()+fontH+2 > height())
+                    roundLabelPoints r;
+                    r.name = pieces.at(i).nombre;
+                    r.start = start;
+                    r.intersec = intersec;
+                    top_labels.append(r);
+                }
+                else if(intersec.y()+fontH+2 > height())
+                {
                     line.intersect(bottom_line,&intersec);
-                painter->drawLine(start,intersec);
-                painter->drawLine(intersec,QPoint(intersec.x()-6,intersec.y()));
-                painter->drawRoundRect(intersec.x()-fontW-14,intersec.y()-fontH/2,fontW+7,fontH+2);
-                painter->drawText(intersec.x()-fontW-10,intersec.y()+fontH/2,s);
+                    roundLabelPoints r;
+                    r.name = pieces.at(i).nombre;
+                    r.start = start;
+                    r.intersec = intersec;
+                    bottom_labels.append(r);
+                }
+                else
+                {*/
+                    roundLabelPoints r;
+                    r.name = pieces.at(i).nombre;
+                    r.start = start;
+                    r.intersec = intersec;
+                    r.value = pieces.at(i).value();
+                    left_labels.append(r);
+                //}
             }
         }
         else if(pUse >225 && pUse <= 315)
@@ -867,56 +913,187 @@ void OpenChart::drawLeyendaCircular(QPainter *painter)
             if(line.intersect(bottom_line,&intersec) == QLineF::UnboundedIntersection
                     || line.intersect(bottom_line,&intersec) == QLineF::BoundedIntersection)
             {
-                bool rigth = intersec.x() >= width()/2;
-                bool midle = (width()/2 - 5 <= intersec.x()) && (intersec.x() <= width()/2 + 5);
-                if(midle)
+               /* bool rigth = intersec.x() >= width()/2;
+                if(rigth)
                 {
-                    painter->drawLine(start,QPoint(width()/2,intersec.y()));
-                    painter->drawRoundRect(width()/2 - fontW/2,intersec.y()-fontH/2+5,fontW+14,fontH+2);
-                    painter->drawText(width()/2 - fontW/2+5,intersec.y()+fontH/2+5,s);
-                }
-                else
-                {
-                    if(rigth)
+                    if(intersec.x()+fontW+14 > width())
                     {
-                        if(intersec.x()+fontW+14 > width())
-                            line.intersect(rigth_line,&intersec);
-                        painter->drawLine(start,intersec);
-                        painter->drawLine(intersec,QPoint(intersec.x()+6,intersec.y()));
-                        painter->drawRoundRect(intersec.x()+6,intersec.y()-fontH/2,fontW+14,fontH+2);
-                        painter->drawText(intersec.x()+13,intersec.y()+fontH/2,s);
+                        line.intersect(rigth_line,&intersec);
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        if(rigth_labels.isEmpty())
+                            rigth_labels.append(r);
+                        else
+                            rigth_labels.insert(0,r);
                     }
                     else
                     {
-                        if(intersec.x()-fontW-14 < 0)
-                            line.intersect(left_line,&intersec);
-                        painter->drawLine(start,intersec);
-                        painter->drawLine(intersec,QPoint(intersec.x()-6,intersec.y()));
-                        painter->drawRoundRect(intersec.x()-fontW-14,intersec.y()-fontH/2,fontW+7,fontH+2);
-                        painter->drawText(intersec.x()-fontW-10,intersec.y()+fontH/2,s);
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        rigth_labels.append(r);
                     }
                 }
+                else
+                {
+                    if(intersec.x()-fontW-14 < 0)
+                    {
+                        line.intersect(left_line,&intersec);
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        left_labels.append(r);
+                    }
+                    else
+                    {
+                        roundLabelPoints r;
+                        r.name = pieces.at(i).nombre;
+                        r.start = start;
+                        r.intersec = intersec;
+                        rigth_labels.append(r);
+                    }
+                }*/
+                roundLabelPoints r;
+                r.name = pieces.at(i).nombre;
+                r.start = start;
+                r.value = pieces.at(i).value();
+                bottom_labels.append(r);
             }
         }
         else
         {
-
             if(line.intersect(rigth_line,&intersec) == QLineF::UnboundedIntersection
                     || line.intersect(rigth_line,&intersec) == QLineF::BoundedIntersection)
             {
-                if(intersec.y()-fontH/2 < 0)
+               /* if(intersec.y()-fontH/2 < 0)
+                {
                     line.intersect(top_line,&intersec);
-                if(intersec.y()+fontH+2 > height())
+                    roundLabelPoints r;
+                    r.name = pieces.at(i).nombre;
+                    r.start = start;
+                    r.intersec = intersec;
+                    top_labels.append(r);
+                }
+                else if(intersec.y()+fontH+2 > height())
+                {
                     line.intersect(bottom_line,&intersec);
-                painter->drawLine(start,intersec);
-                painter->drawLine(intersec,QPoint(intersec.x()+5,intersec.y()));
-                painter->drawRoundRect(intersec.x()+5,intersec.y()-fontH/2,fontW+14,fontH+2);
-                painter->drawText(intersec.x()+13,intersec.y()+fontH/2,s);
+                    roundLabelPoints r;
+                    r.name = pieces.at(i).nombre;
+                    r.start = start;
+                    r.intersec = intersec;
+                    bottom_labels.append(r);
+                }
+                else
+                {
+                    roundLabelPoints r;
+                    r.name = pieces.at(i).nombre;
+                    r.start = start;
+                    r.intersec = intersec;
+                    rigth_labels.append(r);
+                }*/
+                roundLabelPoints r;
+                r.name = pieces.at(i).nombre;
+                r.start = start;
+                r.intersec = intersec;
+                r.value = pieces.at(i).value();
+                if(pUse <=45)
+                    rigth_labels.prepend(r);
+                else if(rigth_labels.isEmpty())
+                    rigth_labels.prepend(r);
+                else if(rigth_labels.first().intersec.y() > intersec.y())
+                    rigth_labels.prepend(r);
+                else if(rigth_labels.last().intersec.y() < intersec.y())
+                    rigth_labels.append(r);
+                else
+                {
+                    for(int b=rigth_labels.size()-1;b>-1;b--)
+                    {
+                        if(rigth_labels.at(b).intersec.y() <= intersec.y())
+                        {
+                            rigth_labels.insert(b+1,r);
+                            break;
+                        }
+                    }
+                }
             }
         }
         palpha += pdegree;
     }
+    painter->setBrush(Qt::white);
+    if(!top_labels.isEmpty())
+    {
+        int top_size = (this->width()-10)/top_labels.size();
+        int start = 5;
+        int y = top_labels.at(0).intersec.y();
+        for (int i=top_labels.size()-1;i>-1;i--)
+        {
+            QString s = QString("%1 : %2").arg(top_labels.at(i).name).arg(top_labels.at(i).value);
+            int w = painter->fontMetrics().width(s)+6;
+            painter->drawLine(top_labels.at(i).start,QPoint(start+top_size/2,m_top-fontH*1.5));
+            painter->drawRect(start+top_size/2-w/2,m_top-fontH*2,w,fontH);
+            painter->drawText(start,m_top-fontH*2,top_size,fontH,Qt::AlignCenter,s);
+            start+= top_size;
+        }
+    }
+    if(!rigth_labels.isEmpty())
+    {
+        int start = m_top - fontH;
+        int stop = height()-5;
 
+        if(top_labels.isEmpty())
+            start-= fontH;
+        if(!bottom_labels.isEmpty())
+            stop-= fontH;
+        int rigth_size = (stop-start)/rigth_labels.size();
+        for (int i=0;i<rigth_labels.size();i++)
+        {
+            QString s = QString("%1 : %2").arg(rigth_labels.at(i).name).arg(rigth_labels.at(i).value);
+            int w = painter->fontMetrics().width(s)+6;
+            painter->drawLine(rigth_labels.at(i).start,QPoint(width()-w/2,start+rigth_size/2));
+            painter->drawRect(width()-w-1,start-fontH/2+rigth_size/2,w,fontH);
+            painter->drawText(width()-w+1,start-fontH/2+rigth_size/2,w,fontH,Qt::AlignCenter,s);
+            start+= rigth_size;
+        }
+    }
+    if(!left_labels.isEmpty())
+    {
+        int start = m_top - fontH;
+        int stop = height()-5;
+
+        if(top_labels.isEmpty())
+            start-= fontH;
+        if(!bottom_labels.isEmpty())
+            stop-= fontH;
+        int left_size = (stop-start)/left_labels.size();
+        for (int i=0;i<left_labels.size();i++)
+        {
+            QString s = QString("%1 : %2").arg(left_labels.at(i).name).arg(left_labels.at(i).value);
+            int w = painter->fontMetrics().width(s)+6;
+            painter->drawLine(left_labels.at(i).start,QPoint(w/2,start+left_size/2));
+            painter->drawRect(1,start-fontH/2+left_size/2,w,fontH);
+            painter->drawText(1,start-fontH/2+left_size/2,w,fontH,Qt::AlignCenter,s);
+            start+= left_size;
+        }
+    }
+    if(!bottom_labels.isEmpty())
+    {
+        int bottom_size = (this->width()-10)/bottom_labels.size();
+        int start = 5;
+        int y = bottom_labels.at(0).intersec.y();
+        for (int i=0;i<bottom_labels.size();i++)
+        {
+            QString s = QString("%1 : %2").arg(bottom_labels.at(i).name).arg(bottom_labels.at(i).value);
+            int w = painter->fontMetrics().width(s)+6;
+            painter->drawLine(bottom_labels.at(i).start,QPoint(start+bottom_size/2,m_bottom+fontH*1.5));
+            painter->drawRect(start+bottom_size/2-w/2,m_bottom+fontH,w,fontH);
+            painter->drawText(start,m_bottom+fontH,bottom_size,fontH,Qt::AlignCenter,s);
+            start+= bottom_size;
+        }
+    }
     painter->restore();
 }
 
