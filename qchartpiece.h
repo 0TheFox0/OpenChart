@@ -1,10 +1,10 @@
 #ifndef QCHARTPIECE_H
 #define QCHARTPIECE_H
-
+#include "global_header.h"
 #include <QObject>
 #include <QColor>
 #include <QVector>
-class QChartPiece : public QObject
+class  SHAREDLIBSHARED_EXPORT QChartPiece : public QObject
 {
     Q_OBJECT
 public:

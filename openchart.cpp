@@ -1161,3 +1161,11 @@ void OpenChart::startAnimation()
     else
         setPercent(100);
 }
+void OpenChart::Clear()
+{
+    pieces.clear();
+    multibarColors.clear();lineasStops.clear();
+    m_mayor =0;
+    m_maxValue = 0;
+    m_menor = 0;
+}

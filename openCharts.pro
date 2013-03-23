@@ -9,5 +9,5 @@ LIBS        += -L.
 
 target.path = $$[QT_INSTALL_PLUGINS]/designer
 INSTALLS    += target
-
+CONFIG+=static
 include(openchart.pri)
