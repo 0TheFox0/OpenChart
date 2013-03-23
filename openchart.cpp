@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QTime>
 #include <qmath.h>
-
+#include <QPropertyAnimation>
 OpenChart::OpenChart(QWidget *parent) :
     QWidget(parent)
 {
@@ -12,37 +12,15 @@ OpenChart::OpenChart(QWidget *parent) :
     m_maxValue = 0;
     m_menor = 0;
 
-    m_type = Sectores_2D;
+    m_type = Barras;
     m_sombra = true;
     m_useLeyenda = true;
-    m_tipoLeyenda = Circular;
+    m_tipoLeyenda = Vertical;
     m_usingTitle = true;
     m_title = "Un titulo";
-    m_valuesEnY = true;
-
-    QVector<float>v1;
-    v1 << 10 << 20 << 5;
-
-    QVector<float>v2;
-    v2 << 20 << -20 << -5;
-    addItem("1",v1,Qt::darkBlue);
-    addItem("2",v1);
-    addItem("3",v1);
-    addItem("4",v1);
-    addItem("5",v1);
-    addItem("6",v1);
-     addItem("7",v1);
-      addItem("8",v1);
-       addItem("9",v1);
-    addItem("10",v1,Qt::darkGreen);
-    addItem("11",v1);
-    addItem("12",v1);
-    addItem("13",v1);
-    addItem("14",v1);
-    addItem("15",v1);
-    addItem("16",v1);
-
-    lineasStops << "Hola" <<"Hola-Adios"<< "Adios";
+    m_valuesEnY = true;   
+    m_animation = true;
+    m_aniDuration = 700;
 }
 
 QSize OpenChart::minimumSizeHint() const
@@ -60,7 +38,7 @@ void OpenChart::addItem(QString nombre, float value)
 
 void OpenChart::addItem(QString nombre, float value, QColor color)
 {
-    ChartPiece p;
+    QChartPiece p;
     p.nombre = nombre;
     p.addValue(value);
     p.color = color;
@@ -69,6 +47,7 @@ void OpenChart::addItem(QString nombre, float value, QColor color)
     m_mayor = qMax(m_mayor,(int)value);
     m_menor = qMin(m_menor,(int)value);
     m_maxValue = qMax(m_mayor, -m_menor);
+    startAnimation();
 }
 
 void OpenChart::addItem(QString nombre, QVector<float> values)
@@ -81,7 +60,7 @@ void OpenChart::addItem(QString nombre, QVector<float> values)
 
 void OpenChart::addItem(QString nombre, QVector<float> values, QColor color)
 {
-    ChartPiece p;
+    QChartPiece p;
     p.nombre = nombre;
     p.addValue(values);
     p.color = color;
@@ -94,6 +73,7 @@ void OpenChart::addItem(QString nombre, QVector<float> values, QColor color)
         m_menor = qMin(m_menor,(int)value);
     }
     m_maxValue = qMax(m_mayor, -m_menor);
+    startAnimation();
 }
 
 void OpenChart::addMulibarColor(QString nombre, QColor color)
@@ -299,6 +279,7 @@ void OpenChart::paintEvent(QPaintEvent *)
             drawYValues(&painter);
         drawAxis(&painter);
         drawLines(&painter);
+        break;
     case Sectores_2D:
         drawPie(&painter);
     default:
@@ -1157,4 +1138,26 @@ QPointF OpenChart::GetPoint(double angle, double R1, double R2)
     point.setX(x);
     point.setY(y);
     return point;
+}
+
+void OpenChart::setPercent(float f)
+{
+    for(int i=0;i<pieces.size();i++)
+        pieces[i].setPercent(f);
+    this->repaint();
+}
+
+void OpenChart::startAnimation()
+{
+    if(m_animation)
+    {
+        QPropertyAnimation *ani = new QPropertyAnimation(this,"percent",this);
+        connect(ani,SIGNAL(finished()),ani,SLOT(deleteLater()));
+        ani->setStartValue(0);
+        ani->setEndValue(100);
+        ani->setDuration(m_aniDuration);
+        ani->start();
+    }
+    else
+        setPercent(100);
 }
