@@ -36,7 +36,7 @@ QString OpenChartPlugin::name() const
 
 QString OpenChartPlugin::group() const
 {
-    return QLatin1String("Charts");
+    return QLatin1String("");
 }
 
 QIcon OpenChartPlugin::icon() const
@@ -46,12 +46,12 @@ QIcon OpenChartPlugin::icon() const
 
 QString OpenChartPlugin::toolTip() const
 {
-    return QLatin1String("OpenChart created by TheFox");
+    return QLatin1String("");
 }
 
 QString OpenChartPlugin::whatsThis() const
 {
-    return QLatin1String("OpenSource Qt Charts");
+    return QLatin1String("");
 }
 
 bool OpenChartPlugin::isContainer() const
@@ -68,5 +68,6 @@ QString OpenChartPlugin::includeFile() const
 {
     return QLatin1String("openchart.h");
 }
-
+#if QT_VERSION < 0x050000
 Q_EXPORT_PLUGIN2(openchartplugin, OpenChartPlugin)
+#endif // QT_VERSION < 0x050000

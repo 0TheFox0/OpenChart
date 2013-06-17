@@ -27,7 +27,7 @@ private:
 signals:
 
 public slots:
-    
+
 };
 
 #endif // QCHARTPIECE_H

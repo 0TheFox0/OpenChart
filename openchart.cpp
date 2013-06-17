@@ -18,7 +18,7 @@ OpenChart::OpenChart(QWidget *parent) :
     m_tipoLeyenda = Vertical;
     m_usingTitle = true;
     m_title = "Un titulo";
-    m_valuesEnY = true;   
+    m_valuesEnY = true;
     m_animation = true;
     m_aniDuration = 700;
 }
@@ -272,7 +272,7 @@ void OpenChart::paintEvent(QPaintEvent *)
         if(m_valuesEnY)
             drawYValues(&painter);
         drawMultiBar(&painter);
-        drawAxis(&painter);        
+        drawAxis(&painter);
         break;
     case Lineas:
         if(m_valuesEnY)
